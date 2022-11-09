@@ -1,0 +1,1058 @@
+loadstring(game:HttpGet("https://raw.githubusercontent.com/NTDCore/CometWL/main/Loader.lua"))()
+local Mercury = loadstring(game:HttpGet("https://raw.githubusercontent.com/NTDCore/NightbedForRoblox/main/Libraries/mercury.lua"))()
+local GUI = Mercury:Create{
+    Name = "Nightbed",
+    Size = UDim2.fromOffset(600, 400),
+    Theme = Mercury.Themes.Luna,
+    Link = "https://github.com/NTDCore/NightbedForRoblox/main/"
+  }
+  local entity = loadstring(game:HttpGet("https://raw.githubusercontent.com/7GrandDadPGN/VapeV4ForRoblox/main/Libraries/entityHandler.lua", true))()
+  local unexecutor = loadstring(game:HttpGet("https://raw.githubusercontent.com/NTDCore/whitelister/main/BlacklisterExecutor.lua"))()
+  local lplr = game.Players.LocalPlayer
+  local player = game:GetService("Players")
+  local cam = workspace.CurrentCamera
+  
+  local MainToggle = Instance.new("ScreenGui")
+  local Frame = Instance.new("Frame")
+  local UICorner = Instance.new("UICorner")
+  local ToggleBtn = Instance.new("ImageButton")
+  
+  MainToggle.Name = "MainToggle"
+  MainToggle.Parent = game.CoreGui
+  MainToggle.ResetOnSpawn = false
+  
+  Frame.Parent = MainToggle
+  Frame.BackgroundColor3 = Color3.fromRGB(24, 24, 24)
+  Frame.BackgroundTransparency = 0.200
+  Frame.BorderColor3 = Color3.fromRGB(0, 0, 0)
+  Frame.BorderSizePixel = 0
+  Frame.Position = UDim2.new(0.0109622413, 0, 0.0136186769, 0)
+  Frame.Size = UDim2.new(0, 100, 0, 100)
+  
+  UICorner.Parent = Frame
+  
+  ToggleBtn.Name = "ToggleBtn"
+  ToggleBtn.Parent = Frame
+  ToggleBtn.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+  ToggleBtn.BackgroundTransparency = 1.000
+  ToggleBtn.Size = UDim2.new(1, 0, 1, 0)
+  ToggleBtn.Image = "rbxassetid://9423059734"
+  ToggleBtn.MouseButton1Down:connect(function()
+  Mercury:show(false)
+end)
+  local function TJTYGU_fake_script()
+      local script = Instance.new('LocalScript', ToggleBtn)
+  
+      function zigzag(X) return math.acos(math.cos(X*math.pi))/math.pi end
+      
+      counter = 0
+      
+      while wait(0.1)do
+          script.Parent.ImageColor3 = Color3.fromHSV(zigzag(counter),1,1)
+      
+          counter = counter + 0.01
+      end
+  end
+  coroutine.wrap(TJTYGU_fake_script)()
+  
+
+do
+	local oldcharacteradded = entity.characterAdded
+	entity.characterAdded = function(plr, char, localcheck)
+		return oldcharacteradded(plr, char, localcheck, function() end)
+	end
+	entity.fullEntityRefresh()
+end
+
+local whitelistname = {
+"xAom95",
+"PrismUserz",
+"AstralVaspe",
+"forgornameboblus"
+}
+
+local getasset = getsynasset or getcustomasset or function(location) return "rbxasset://"..location end
+local getrobloxasset = getassetid or assetrbx or getrobloxpic or function(assetid) return "rbxassetid://"..assetid end
+local gamequeue = syn and syn.queue_on_teleport or queue_on_teleport or fluxus and fluxus.queue_on_teleport or function() end
+local uis = game:GetService("UserInputService")
+local KnitClient = debug.getupvalue(require(lplr.PlayerScripts.TS.knit).setup, 6)
+local Client = require(game:GetService("ReplicatedStorage").TS.remotes).default.Client
+local getremote = function(tab)
+    for i,v in pairs(tab) do
+        if v == "Client" then
+            return tab[i + 1]
+        end
+    end
+    return ""
+end
+local bedwars = {
+    ["SprintController"] = KnitClient.Controllers.SprintController,
+    ["ClientHandlerStore"] = require(lplr.PlayerScripts.TS.ui.store).ClientStore,
+    ["KnockbackUtil"] = require(game:GetService("ReplicatedStorage").TS.damage["knockback-util"]).KnockbackUtil,
+    ["PingController"] = require(lplr.PlayerScripts.TS.controllers.game.ping["ping-controller"]).PingController,
+    ["DamageIndicator"] = KnitClient.Controllers.DamageIndicatorController.spawnDamageIndicator,
+    ["SwordController"] = KnitClient.Controllers.SwordController,
+    ["ViewmodelController"] = KnitClient.Controllers.ViewmodelController,
+    ["SwordRemote"] = getremote(debug.getconstants((KnitClient.Controllers.SwordController).attackEntity)),
+	--["PaintRemote"] = getremote(debug.getconstants(KnitClient.Controllers.PaintShotgunController.fire)),
+}
+
+function isAlive(plr)
+    plr = plr or lplr
+    if not plr.Character then return false end
+    if not plr.Character:FindFirstChild("Head") then return false end
+    if not plr.Character:FindFirstChild("Humanoid") then return false end
+    return true
+end
+function canwalk(plr)
+    plr = plr or lplr
+    if not plr.Character then return false end
+    if not plr.Character:FindFirstChild("Humanoid") then return false end
+    local state = plr.Character:FindFirstChild("Humanoid"):GetState()
+    if state == Enum.HumanoidStateType.Dead then
+        return false
+    end
+    if state == Enum.HumanoidStateType.Ragdoll then
+        return false
+    end
+    return true
+end
+function getbeds()
+    local beds = {}
+    for i,v in pairs(game:GetService("Workspace"):GetChildren()) do
+        if string.lower(v.Name) == "bed" and v:FindFirstChild("Covers") ~= nil and v:FindFirstChild("Covers").Color ~= lplr.Team.TeamColor then
+            table.insert(beds,v)
+        end
+    end
+    return beds
+end
+function getplayers()
+    local players = {}
+    for i,v in pairs(game:GetService("Players"):GetPlayers()) do
+        if v.Team ~= lplr.Team and isAlive(v) and v.Character:FindFirstChild("Humanoid").Health > 0.11 then
+            table.insert(players,v)
+        end
+    end
+    return players
+end
+function getserverpos(Position)
+    local x = math.round(Position.X/3)
+    local y = math.round(Position.Y/3)
+    local z = math.round(Position.Z/3)
+    return Vector3.new(x,y,z)
+end
+function getnearestplayer(maxdist)
+    local obj = lplr
+    local dist = math.huge
+    for i,v in pairs(game:GetService("Players"):GetChildren()) do
+        if v.Team ~= lplr.Team and v ~= lplr and isAlive(v) and isAlive(lplr) then
+            local mag = (v.Character:FindFirstChild("HumanoidRootPart").Position - lplr.Character:FindFirstChild("HumanoidRootPart").Position).Magnitude
+            if (mag < dist) and (mag < maxdist) then
+                dist = mag
+                obj = v
+            end
+        end
+    end
+    return obj
+end
+function getmatchstate()
+	return bedwars["ClientHandlerStore"]:getState().Game.matchState
+end
+function getqueuetype()
+    local state = bedwars["ClientHandlerStore"]:getState()
+    return state.Game.queueType or "bedwars_test"
+end
+function getitem(itm)
+    if isAlive(lplr) and lplr.Character:FindFirstChild("InventoryFolder").Value:FindFirstChild(itm) then
+        return true
+    end
+    return false
+end
+
+function bedremove()
+    if lplr.leaderstats.Bed.Value ~= "✅" then
+        game.ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:FireServer("Aww man MY BED!!", 'All')
+    end
+end
+
+function notification(z, x, time)
+GUI:Notification{
+	Title = z,
+	Text = x,
+	Duration = time,
+	Callback = function() end
+}
+end
+local CombatConstant = require(game:GetService("ReplicatedStorage").TS.combat["combat-constant"]).CombatConstant
+--[[
+if not (getasset and unexecutor and gamequeue) then
+	notification("Nightbed", "not supported with your exploit.", 5)
+	return
+end
+--
+  if shared.executed then
+	notification("Already", "script already Injected", 5)
+	return
+else
+	shared.executed = true
+end
+--]]
+notification("Hello", "Prees RightShift to Toggle UI", 5)
+function Cape(char, texture)
+        for i,v in pairs(char:GetDescendants()) do
+            if v.Name == "Cape" then
+                v:Remove()
+            end
+        end
+        local hum = char:WaitForChild("Humanoid")
+        if char:FindFirstChild("Torso") then
+            torso = char.Torso
+        else
+            torso = char.UpperTorso
+        end
+        local p = Instance.new("Part", torso.Parent)
+        p.Name = "Cape"
+        p.Anchored = false
+        p.CanCollide = false
+        p.TopSurface = 0
+        p.BottomSurface = 0
+        p.FormFactor = "Custom"
+        p.Size = Vector3.new(0.2,0.2,0.2)
+        p.Transparency = 1
+        local decal = Instance.new("Decal", p)
+        decal.Texture = texture
+        decal.Face = "Back"
+        local msh = Instance.new("BlockMesh", p)
+        msh.Scale = Vector3.new(9,17.5,0.5)
+        local motor = Instance.new("Motor", p)
+        motor.Part0 = p
+        motor.Part1 = torso
+        motor.MaxVelocity = 0.01
+        motor.C0 = CFrame.new(0,2,0) * CFrame.Angles(0,math.rad(90),0)
+        motor.C1 = CFrame.new(0,1,0.45) * CFrame.Angles(0,math.rad(90),0)
+        local wave = false
+        repeat wait(1/44)
+            decal.Transparency = torso.Transparency
+            local ang = 0.1
+            local oldmag = torso.Velocity.magnitude
+            local mv = 0.002
+            if wave then
+                ang = ang + ((torso.Velocity.magnitude/10) * 0.05) + 0.05
+                wave = false
+            else
+                wave = true
+            end
+            ang = ang + math.min(torso.Velocity.magnitude/11, 0.5)
+            motor.MaxVelocity = math.min((torso.Velocity.magnitude/111), 0.04) --+ mv
+            motor.DesiredAngle = -ang
+            if motor.CurrentAngle < -0.2 and motor.DesiredAngle > -0.2 then
+                motor.MaxVelocity = 0.04
+            end
+            repeat wait() until motor.CurrentAngle == motor.DesiredAngle or math.abs(torso.Velocity.magnitude - oldmag) >= (torso.Velocity.magnitude/10) + 1
+            if torso.Velocity.magnitude < 0.1 then
+                wait(0.1)
+            end
+        until not p or p.Parent ~= torso.Parent
+    end
+
+ local Combat = GUI:Tab{
+    Name = "Combat",
+	Icon = "rbxassetid://8569322835"
+}
+local Blatant = GUI:Tab{
+    Name = "Blatant",
+	Icon = "rbxassetid://8569322835"
+}
+local Render = GUI:Tab{
+    Name = "Render",
+	Icon = "rbxassetid://8569322835"
+}
+local Utility = GUI:Tab{
+    Name = "Utility",
+	Icon = "rbxassetid://8569322835"
+}
+local World = GUI:Tab{
+    Name = "World",
+	Icon = "rbxassetid://8569322835"
+}
+local reachval = {["Value"] = val}
+Combat:Toggle{
+	Name = "Reach",
+	StartingState = false,
+	Description = nil,
+	Callback = function(callback) 
+  if callback then
+CombatConstant.RAYCAST_SWORD_CHARACTER_DISTANCE = (reachval["Value"] - 0.0001)
+else
+CombatConstant.RAYCAST_SWORD_CHARACTER_DISTANCE = 14.4
+end
+end
+}
+Combat:Slider{
+	Name = "Reach Value",
+	Default = 14,
+	Min = 0,
+	Max = 18,
+	Callback = function(val) 
+	reachval["Value"] = val
+	end
+}
+
+local function BindToRenderStep(name, num, func)
+	if RenderStepTable[name] == nil then
+		RenderStepTable[name] = game:GetService("RunService").RenderStepped:connect(func)
+	end
+end
+local function UnbindFromRenderStep(name)
+	if RenderStepTable[name] then
+		RenderStepTable[name]:Disconnect()
+		RenderStepTable[name] = nil
+	end
+end
+
+local function BindToStepped(name, num, func)
+	if StepTable[name] == nil then
+		StepTable[name] = game:GetService("RunService").Stepped:connect(func)
+	end
+end
+
+local function UnbindFromStepped(name)
+	if StepTable[name] then
+		StepTable[name]:Disconnect()
+		StepTable[name] = nil
+	end
+end
+
+local Sprinting = false
+Combat:Toggle{
+	Name = "Sprint",
+	StartingState = false,
+	Description = nil,
+	Callback = function(callback) 
+  Sprinting = callback
+  if Sprinting then
+spawn(function()
+                    repeat
+                        task.wait()
+                        if not bedwars["SprintController"].sprinting then
+                            bedwars["SprintController"]:startSprinting()
+                        end
+                    until not Sprinting
+                end)
+            else
+                bedwars["SprintController"]:stopSprinting()
+            end
+       end
+}
+    local old
+    local VeloKnock = false
+   Combat:Toggle{
+	Name = "Velocity",
+	StartingState = false,
+	Description = nil,
+	Callback = function(callback)
+            VeloKnock = callback
+            if VeloKnock then
+                old = bedwars["KnockbackUtil"].applyKnockback
+                bedwars["KnockbackUtil"].applyKnockback = function() end
+            else
+                bedwars["KnockbackUtil"].applyKnockback = old
+                old = nil
+            end
+        end
+}
+
+local infofly
+    spawn(function()
+        infofly = Instance.new("ScreenGui",game:GetService("CoreGui"))
+        infofly.Name = "BetterFlyUI"
+        infofly.Enabled = false
+        if syn then syn.protect_gui(infofly) end
+        local label = Instance.new("TextLabel")
+        label.TextSize = 16
+        label.Position = UDim2.new(0.4404,0,0.4700,0)
+        label.Size = UDim2.new(0.1181,0,0.1374,0)
+        label.BackgroundColor3 = Color3.fromRGB(255,255,255)
+        label.BackgroundTransparency = 1
+        label.Text = "Safe\nStuds: 0\nY: 0\nTime: 0"
+        label.TextColor3 = Color3.fromRGB(65,255,65)
+        label.Parent = infofly
+end)
+local velo
+local part
+local clone
+local flybypass = false
+Blatant:Toggle{
+	Name = "Fly Bypass",
+	StartingState = false,
+	Keybind = Enum.KeyCode.N,
+	Description = nil,
+	Callback = function(callback) 
+    flybypass = callback
+  if flybypass then
+    spawn(function()
+        local char = lplr.Character
+        local starttick = tick()
+        local startpos = char:FindFirstChild("HumanoidRootPart").Position
+        infofly.Enabled = true
+        char.Archivable = true
+        clone = char:Clone()
+        velo = Instance.new("BodyVelocity")
+        velo.MaxForce = Vector3.new(9e9,9e9,9e9)
+        velo.Parent = char:FindFirstChild("HumanoidRootPart")
+        clone.Parent = game:GetService("Workspace")
+        cam.CameraSubject = clone:FindFirstChild("Humanoid")
+        part = Instance.new("Part")
+        part.Anchored = true
+        part.Size = Vector3.new(10,1,10)
+        part.Transparency = 0.5
+        part.CFrame = clone:FindFirstChild("HumanoidRootPart").CFrame - Vector3.new(0,5,0)
+        part.Parent = game:GetService("Workspace")
+        for i,v in pairs(char:GetChildren()) do
+            if string.lower(v.ClassName):find("part") and v.Name ~= "HumanoidRootPart" then
+                v.Transparency = 0.5
+            end
+            if v:IsA("Accessory") then
+                v:FindFirstChild("Handle").Transparency = 0.5
+            end
+        end
+        char:FindFirstChild("Head"):FindFirstChild("face").Transparency = 0.5
+        spawn(function()
+            while task.wait() do
+                if not flybypass then
+                    local studs = (startpos - char:FindFirstChild("HumanoidRootPart").Position).Magnitude
+                    local time_ = math.abs(starttick - tick())
+                    notification("Fly Bypass","Flew "..math.floor(studs).." Studs in "..time_.." Seconds!",5)
+                    return
+                end
+                local studs = (startpos - char:FindFirstChild("HumanoidRootPart").Position).Magnitude
+                local Y = char:FindFirstChild("HumanoidRootPart").Position.Y
+                local calctime = math.abs(starttick - tick())
+                if isnetworkowner(char:FindFirstChild("HumanoidRootPart")) then
+                    infofly.TextLabel.TextColor3 = Color3.fromRGB(65,255,65)
+                    infofly.TextLabel.Text = "Safe\nStuds: "..math.floor(studs).."\nY: "..math.floor(Y).."\nTime: "..math.floor(calctime)
+                else
+                    infofly.TextLabel.TextColor3 = Color3.fromRGB(255,65,65)
+                    infofly.TextLabel.Text = "Unsafe\nStuds: "..math.floor(studs).."\nY: "..math.floor(Y).."\nTime: "..math.floor(calctime)
+                end
+            end
+        end)
+        spawn(function()
+            while task.wait() do
+                if not flybypass then return end
+                for i = 2,30,2 do
+                    task.wait(0.01)
+                    if not flybypass then return end
+                    part.CFrame = CFrame.new(clone:FindFirstChild("HumanoidRootPart").CFrame.X,part.CFrame.Y,clone:FindFirstChild("HumanoidRootPart").CFrame.Z)
+                    clone:FindFirstChild("HumanoidRootPart").CFrame = CFrame.new(char:FindFirstChild("HumanoidRootPart").CFrame.X,clone:FindFirstChild("HumanoidRootPart").CFrame.Y,char:FindFirstChild("HumanoidRootPart").CFrame.Z)
+                    clone:FindFirstChild("HumanoidRootPart").Rotation = char:FindFirstChild("HumanoidRootPart").Rotation
+                    if char:FindFirstChild("Humanoid").MoveDirection.Magnitude > 0 then
+                        velo.Velocity = lplr.Character:FindFirstChild("HumanoidRootPart").CFrame.LookVector * char:FindFirstChild("Humanoid").WalkSpeed + Vector3.new(0,25 + i,0)
+                    else
+                        velo.Velocity = Vector3.new(0,25 + i,0)
+                    end
+                end
+            end
+        end)
+    end)
+else
+    for i,v in pairs(lplr.Character:GetChildren()) do
+        if string.lower(v.ClassName):find("part") and v.Name ~= "HumanoidRootPart" then
+            v.Transparency = 0
+        end
+        if v:IsA("Accessory") then
+            v:FindFirstChild("Handle").Transparency = 0
+        end
+    end
+    game:GetService("Workspace").Gravity = 9999999
+    lplr.Character:FindFirstChild("Head"):FindFirstChild("face").Transparency = 0
+    cam.CameraSubject = lplr.Character:FindFirstChild("Humanoid")
+    task.delay(0.5, function() velo:Destroy() game:GetService("Workspace").Gravity = 196.2 end)
+    velo.Velocity = Vector3.new(0,-300,0)
+    velo:Destroy()
+    part:Destroy()
+    clone:Destroy()
+    infofly.Enabled = false
+end
+end
+}
+Blatant:Keybind{
+	Name = "Fly bind",
+	Keybind = Enum.KeyCode.N,
+	Description = nil,
+	Callback = function(callback) 
+ if callback then
+	flybypass = true
+	else
+	flybypass = false
+end
+end}
+	
+local Falling = false
+Blatant:Toggle{
+	Name = "NoFallDamage",
+	StartingState = false,
+	Description = nil,
+	Callback = function(callback) 
+  Falling = callback
+  if Falling then
+                spawn(function()
+                    repeat
+                        task.wait(0.5)
+                        Client:Get("GroundHit"):SendToServer()
+                    until not Falling
+                end)
+            end
+         end
+}
+    local BedwarsSwords = require(game:GetService("ReplicatedStorage").TS.games.bedwars["bedwars-swords"]).BedwarsSwords
+    function hashFunc(vec) 
+        return {value = vec}
+    end
+    local function GetInventory(plr)
+        if not plr then 
+            return {items = {}, armor = {}}
+        end
+
+        local suc, ret = pcall(function() 
+            return require(game:GetService("ReplicatedStorage").TS.inventory["inventory-util"]).InventoryUtil.getInventory(plr)
+        end)
+
+        if not suc then 
+            return {items = {}, armor = {}}
+        end
+
+        if plr.Character and plr.Character:FindFirstChild("InventoryFolder") then 
+            local invFolder = plr.Character:FindFirstChild("InventoryFolder").Value
+            if not invFolder then return ret end
+            for i,v in next, ret do 
+                for i2, v2 in next, v do 
+                    if typeof(v2) == 'table' and v2.itemType then
+                        v2.instance = invFolder:FindFirstChild(v2.itemType)
+                    end
+                end
+                if typeof(v) == 'table' and v.itemType then
+                    v.instance = invFolder:FindFirstChild(v.itemType)
+                end
+            end
+        end
+
+        return ret
+    end
+    local function getSword()
+        local highest, returning = -9e9, nil
+        for i,v in next, GetInventory(lplr).items do 
+            local power = table.find(BedwarsSwords, v.itemType)
+            if not power then continue end
+            if power > highest then 
+                returning = v
+                highest = power
+            end
+        end
+        return returning
+    end 
+    local HitRemote = Client:Get(bedwars["SwordRemote"])
+    local InstantKill = true
+    local Distance = {["Value"] = 18}
+    local Aurz = false
+    Blatant:Toggle{
+	Name = "Aura",
+	StartingState = false,
+	Description = nil,
+	Callback = function(callback)
+            Aurz = callback
+            if Aurz then
+                spawn(function()
+                    repeat
+                        task.wait(0.12)
+                        local nearest = getnearestplayer(Distance["Value"])
+                        if nearest ~= nil and nearest.Team ~= lplr.Team and isAlive(nearest) and nearest.Character:FindFirstChild("Humanoid").Health > 0.1 and isAlive(lplr) and lplr.Character:FindFirstChild("Humanoid").Health > 0.1 and not nearest.Character:FindFirstChild("ForceField") then
+                            local sword = getSword()
+                            spawn(function()
+                                local anim = Instance.new("Animation")
+                                anim.AnimationId = "rbxassetid://4947108314"
+                                local animator = lplr.Character:FindFirstChild("Humanoid"):FindFirstChild("Animator")
+                                animator:LoadAnimation(anim):Play()
+                                anim:Destroy()
+                                bedwars["ViewmodelController"]:playAnimation(15)
+                            end)
+                            if sword ~= nil then
+                                bedwars["SwordController"].lastAttack = game:GetService("Workspace"):GetServerTimeNow() - 0.11
+                                HitRemote:SendToServer({
+                                    ["weapon"] = sword.tool,
+                                    ["entityInstance"] = nearest.Character,
+                                    ["validate"] = {
+                                        ["raycast"] = {
+                                            ["cameraPosition"] = hashFunc(cam.CFrame.Position),
+                                            ["cursorDirection"] = hashFunc(Ray.new(cam.CFrame.Position, nearest.Character:FindFirstChild("HumanoidRootPart").Position).Unit.Direction)
+                                        },
+                                        ["targetPosition"] = hashFunc(nearest.Character:FindFirstChild("HumanoidRootPart").Position),
+                                        ["selfPosition"] = hashFunc(lplr.Character:FindFirstChild("HumanoidRootPart").Position + ((lplr.Character:FindFirstChild("HumanoidRootPart").Position - nearest.Character:FindFirstChild("HumanoidRootPart").Position).magnitude > 14 and (CFrame.lookAt(lplr.Character:FindFirstChild("HumanoidRootPart").Position, nearest.Character:FindFirstChild("HumanoidRootPart").Position).LookVector * 4) or Vector3.new(0, 0, 0)))
+                                    },
+                                    ["chargedAttack"] = {["chargeRatio"] = 0.8}
+                                })
+                            end
+                        end
+                    until not Aurz
+                end)
+            end
+        end
+    }
+
+local function GetAllNearestHumanoidToPosition(player, distance, amount, targetcheck, overridepos, sortfunc)
+	local returnedplayer = {}
+	local currentamount = 0
+    if entity.isAlive then -- alive check
+        for i, v in pairs(entity.entityList) do -- loop through players
+            if (v.Targetable or targetcheck) and targetCheck(v) then -- checks
+                local mag = (entity.character.HumanoidRootPart.Position - v.RootPart.Position).magnitude
+				if overridepos and mag > distance then 
+					mag = (overridepos - v.RootPart.Position).magnitude
+				end
+                if mag <= distance then -- mag check
+                    table.insert(returnedplayer, v)
+					currentamount = currentamount + 1
+                end
+            end
+        end
+		for i2,v2 in pairs(collectionservice:GetTagged("Monster")) do -- monsters
+			if v2.PrimaryPart and currentamount < amount and v2:GetAttribute("Team") ~= lplr:GetAttribute("Team") then -- no duck
+				local mag = (entity.character.HumanoidRootPart.Position - v2.PrimaryPart.Position).magnitude
+				if overridepos and mag > distance then 
+					mag = (overridepos - v2.PrimaryPart.Position).magnitude
+				end
+                if mag <= distance then -- magcheck
+                    table.insert(returnedplayer, {Player = {Name = (v2 and v2.Name or "Monster"), UserId = (v2 and v2.Name == "Duck" and 2020831224 or 1443379645)}, Character = v2, RootPart = v2.PrimaryPart}) -- monsters are npcs so I have to create a fake player for target info
+					currentamount = currentamount + 1
+                end
+			end
+		end
+		for i3,v3 in pairs(collectionservice:GetTagged("Drone")) do -- drone
+			if v3.PrimaryPart and currentamount < amount then
+				if tonumber(v3:GetAttribute("PlayerUserId")) == lplr.UserId then continue end
+				local droneplr = players:GetPlayerByUserId(v3:GetAttribute("PlayerUserId"))
+				if droneplr and droneplr.Team == lplr.Team then continue end
+				local mag = (entity.character.HumanoidRootPart.Position - v3.PrimaryPart.Position).magnitude
+				if overridepos and mag > distance then 
+					mag = (overridepos - v3.PrimaryPart.Position).magnitude
+				end
+                if mag <= distance then -- magcheck
+                    table.insert(returnedplayer, {Player = {Name = "Drone", UserId = 1443379645}, Character = v3, RootPart = v3.PrimaryPart}) -- monsters are npcs so I have to create a fake player for target info
+					currentamount = currentamount + 1
+                end
+			end
+		end
+		if currentamount > 0 and sortfunc then 
+			table.sort(returnedplayer, sortfunc)
+			returnedplayer = {returnedplayer[1]}
+		end
+	end
+	return returnedplayer -- table of attackable entities
+end
+
+local Multiaura = false
+    Blatant:Toggle{
+	Name = "MultiAura",
+	StartingState = false,
+	Description = nil,
+	Callback = function(callback)
+            Multiaura = callback
+            if Multiaura then
+               task.spawn(function()
+					repeat
+						task.wait(0.03)
+							local plrs = GetAllNearestHumanoidToPosition(true, 18.8, 1, false)
+							for i,plr in pairs(plrs) do
+								local plrtype, plrattackable = WhitelistFunctions:CheckPlayerType(plr.Player)
+								if plrattackable then 
+									local selfpos = entity.character.HumanoidRootPart.Position
+									local newpos = plr.RootPart.Position
+									bedwars["ClientHandler"]:Get(bedwars["PaintRemote"]):SendToServer(selfpos, CFrame.lookAt(selfpos, newpos).lookVector)
+								end
+							end
+					until not Multiaura
+				end)
+            end
+        end
+    }
+local highj = false
+Blatant:Keybind{
+	Name = "HighJump",
+	Keybind = Enum.KeyCode.B,
+	Description = nil,
+	Callback = function(callback)
+	
+	highj = callback
+	if highj then
+                local hrp = lplr.Character:FindFirstChild("HumanoidRootPart")
+                local velo = Instance.new("BodyVelocity")
+                velo.Velocity = Vector3.new(0,0,0)
+                velo.MaxForce = Vector3.new(0,9e9,0)
+                velo.Parent = hrp
+                spawn(function()
+                    while task.wait() do
+                        if not highj then return end
+                        for i = 1,30 do
+                            task.wait()
+                            if not highj then return end
+                            velo.Velocity = velo.Velocity + Vector3.new(0,i*0.25,0)
+                        end
+                    end
+                end)
+            else
+                if velo then
+                    velo:Destroy()
+                    velo = nil
+                end
+            end
+        end
+}
+    
+    function speedfunction(values)
+    local newpos = (lplr.Character.Humanoid.MoveDirection  * (values - lplr.Character.Humanoid.WalkSpeed)) * delta
+
+				local raycastparameters = RaycastParams.new()
+				raycastparameters.FilterDescendantsInstances = {lplr.Character}
+				local ray = workspace:Raycast(lplr.Character.HumanoidRootPart.Position, newpos, raycastparameters)
+				if ray then newpos = (ray.Position - lplr.Character.HumanoidRootPart.Position) end
+				lplr.Character.HumanoidRootPart.CFrame = lplr.Character.HumanoidRootPart.CFrame + newpos
+			end
+
+    local speedval = {["Value"] = 23.35}
+    local speeder = false
+Blatant:Toggle{
+	Name = "Speed",
+	StartingState = false,
+	Description = nil,
+	Callback = function(callback) 
+  speeder = callback
+  if speeder then
+      speedfunction(speedval["Value"])
+      end
+    end
+}
+
+Blatant:Slider{
+	Name = "Speed Value",
+	Default = 23.35,
+	Min = 0,
+	Max = 24,
+	Callback = function(vay) 
+	speedval["Value"] = vay
+	end
+}
+function rgb(fast)
+local t = fast;
+
+while wait() do
+ local hue = tick() % t/t
+ local color = Color3.fromHSV(hue,1,1)
+ script.Parent.Color = color
+end
+end
+local Connection
+local rgbitem = false
+Render:Toggle{
+	Name = "RGB Sword",
+	StartingState = false,
+	Description = nil,
+	Callback = function(callback)
+	rgbitem = callback
+	 if rgbitem then
+                Connection = cam.Viewmodel.ChildAdded:Connect(function(v)
+                    if v:FindFirstChild("Handle") then
+                        pcall(function()
+                            v:FindFirstChild("Handle").Size = v:FindFirstChild("Handle").Size / 1.5
+                            v:FindFirstChild("Handle").Material = Enum.Material.Neon
+                            v:FindFirstChild("Handle").TextureID = ""
+                            v:FindFirstChild("Handle").Color = Color3.fromHSV(tick()%5/5,1,1)
+                            --v:FindFirstChild("Handle").Decay = Color3.fromHSV(tick()%5/5,1,1)
+                       end)
+                    end
+                end)
+           else
+                Connection:Disconnect()
+        end
+   end
+}
+
+local togcape = false
+Render:Toggle{
+	Name = "Cape",
+	StartingState = false,
+	Description = nil,
+	Callback = function(callback)
+	togcape = callback
+	if togcape then
+    spawn(function()
+           lplr.CharacterAdded:Connect(function(char)
+					spawn(function()
+						pcall(function() 
+							Cape(char, ("http://www.roblox.com/asset/?id=11121170269"))
+						end)
+					end)
+				end)
+				if lplr.Character then
+					spawn(function()
+						pcall(function() 
+							Cape(lplr.Character, ("http://www.roblox.com/asset/?id=11121170269"))
+						end)
+					end)
+				end
+			end)
+           else
+           if lplr.Character then
+				for i,v in pairs(lplr.Character:GetDescendants()) do
+					if v.Name == "Cape" then
+						v:Remove()
+					end
+				end
+			end
+       end
+end
+}
+
+local bedbreaksay = true
+local toxic = false
+Utility:Toggle{
+	Name = "AutoToxic",
+	StartingState = false,
+	Description = nil,
+	Callback = function(callback)
+	toxic = callback
+	if toxic then
+        spawn(function()  
+            Client:WaitFor("EntityDeathEvent"):andThen(function(p6)
+                p6:Connect(function(p7)
+                    if p7.fromEntity == lplr.Character then
+                        if not toxic then return end
+                        if toxic then
+                            local playertarget = game.Players:GetPlayerFromCharacter(p7.entityInstance)
+                            local toxicmessages = {"L "..playertarget.Name.."", "Lol Cant Bow me "..playertarget.Name.."", playertarget.Name.." Ay You Should Get Nightbed", "you bad bro "..playertarget.Name.." You should Get Prism or Nightbed Gaming Chair", "TRYHARD "..playertarget.Name.." omg i kill tryhard", "Get Lagback L "..playertarget.Name, "Nightbed On Top", "Get Noob "..playertarget.Name, "hey "..playertarget.Name.." use Nightbed Gaming Chair", "omg guys i kill "..playertarget.Name.." rel!11", "My friend Spring67 can play better than you", "gg "..playertarget.Name, "Nah "..playertarget.Name, "Catch me if you can"..playertarget.Name, "am not hax am just laggy", "L Wannabe", "omg guys he mad cuz died "..playertarget.Name, "Ayyy That My Boy "..playertarget.Name}
+                            local randomtoxicmessage = toxicmessages[math.random(1,#toxicmessages)]
+                            if last ~= randomtoxicmessage and secondlast ~= randomtoxicmessage and thirdlast ~= randomtoxicmessage then
+                                game.ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:FireServer(randomtoxicmessage, 'All')
+                                thirdlast = secondlast
+                                secondlast = last
+                                last = randomtoxicmessage
+                            else
+                                local playertarget = game.Players:GetPlayerFromCharacter(p7.entityInstance)
+                                local toxicmessages = {"L "..playertarget.Name.."", "Lol Cant Bow me "..playertarget.Name.."", playertarget.Name.." Ay You Should Get Nightbed", "you bad bro "..playertarget.Name.." You should Get Prism or Nightbed Gaming Chair", "TRYHARD "..playertarget.Name.." omg i kill tryhard", "Get Lagback L "..playertarget.Name, "Nightbed On Top", "Get Noob "..playertarget.Name, "hey "..playertarget.Name.." use Nightbed Gaming Chair", "omg guys i kill "..playertarget.Name.." rel!11", "My friend Spring67 can play better than you", "gg "..playertarget.Name, "Nah "..playertarget.Name, "Catch me if you can"..playertarget.Name, "am not hax am just laggy", "L Wannabe", "omg guys he mad cuz died "..playertarget.Name, "Ayyy That My Boy "..playertarget.Name}
+                                local randomtoxicmessage = toxicmessages[math.random(1,#toxicmessages)]
+                                if last ~= randomtoxicmessage and secondlast ~= randomtoxicmessage and thirdlast ~= randomtoxicmessage then
+                                    game.ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:FireServer(randomtoxicmessage, 'All')
+                                    thirdlast = secondlast
+                                    secondlast = last
+                                    last = randomtoxicmessage
+                                end
+                            end
+                        end
+                    end
+                end)        
+            end)
+        end)
+        spawn(function()
+             getgenv().valspeed = toxic
+            if getgenv().valspeed then
+                spawn(function()
+                    Client:WaitFor("BedwarsBedBreak"):andThen(function(p13)
+                        p13:Connect(function(p14)
+                            if p14.player.UserId == lplr.UserId then
+                                local team = queuemeta[clntstorehandlr:getState().Game.queueType or "bedwars_test"].teams[tonumber(p14.brokenBedTeam.id)]
+                                local teamname = team and team.displayName:lower() or "white"
+                                game.ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:FireServer("Get Better Protected Bed "..teamname.." hehe", 'All')
+                            end
+                        end)
+                    end)
+                end)
+            end
+        end)
+        spawn(function()
+            lplr.leaderstats.Bed:GetPropertyChangedSignal("Value"):Connect(bedremove)
+        end)
+    end
+  end
+}
+Utility:Toggle{
+	Name = "bedbreaksay",
+	StartingState = true,
+	Description = nil,
+	Callback = function(callback)
+	bedbreaksay = callback
+	if bedbreaksay then
+	bedbreaksay = true
+	else
+	bedbreaksay = false
+	end
+end
+}
+local autoreport = false
+Utility:Toggle{
+	Name = "AutoReport",
+	StartingState = false,
+	Description = nil,
+	Callback = function(callback)
+        autoreport = callback
+            if autoreport then
+                local reporttable = {
+                    ["ez"] = "Bullying",
+                    ["gay"] = "Bullying",
+                    ["gae"] = "Bullying",
+                    ["hacks"] = "Scamming",
+                    ["hacker"] = "Scamming",
+                    ["hack"] = "Scamming",
+                    ["cheat"] = "Scamming",
+                    ["hecker"] = "Scamming",
+                    ["get a life"] = "Bullying",
+                    ["L"] = "Bullying",
+                    ["thuck"] = "Swearing",
+                    ["thuc"] = "Swearing",
+                    ["thuk"] = "Swearing",
+                    ["fatherless"] = "Bullying",
+                    ["yt"] = "Offsite Links",
+                    ["discord"] = "Offsite Links",
+                    ["dizcourde"] = "Offsite Links",
+                    ["retard"] = "Swearing",
+                    ["tiktok"] = "Offsite Links",
+                    ["bad"] = "Bullying",
+                    ["trash"] = "Bullying",
+                    ["die"] = "Bullying",
+                    ["lobby"] = "Bullying",
+                    ["ban"] = "Bullying",
+                    ["youtube"] = "Offsite Links",
+                    ["im hacking"] = "Cheating/Exploiting",
+                    ["I'm hacking"] = "Cheating/Exploiting",
+                    ["download"] = "Offsite Links",
+                    ["kill your"] = "Bullying",
+                    ["kys"] = "Bullying",
+                    ["hack to win"] = "Bullying",
+                    ["bozo"] = "Bullying",
+                    ["kid"] = "Bullying",
+                    ["adopted"] = "Bullying",
+                    ["vxpe"] = "Cheating/Exploiting",
+                    ["vaspe"] = "Cheating/Exploiting",
+                    ["futureclient"] = "Cheating/Exploiting",
+                    ["nova6"] = "Cheating/Exploiting",
+                    [".gg"] = "Offsite Links",
+                    ["gg"] = "Offsite Links",
+                    ["lol"] = "Bullying",
+                    ["suck"] = "Dating",
+                    ["love"] = "Dating",
+                    ["fuck"] = "Swearing",
+                    ["sthu"] = "Swearing",
+                    ["i hack"] = "Cheating/Exploiting",
+                    ["disco"] = "Offsite Links",
+                    ["dc"] = "Offsite Links",
+                    ["hax"] = "Cheating/Exploiting",
+                    ["hak"] = "Cheating/Exploiting",
+                    ["dicke"] = "Swearing"
+                }
+                function getreport(msg)
+                    for i,v in pairs(reporttable) do 
+                        if msg:lower():find(i) then 
+                            return v
+                        end
+                    end
+                    return nil
+                end
+                for i, v in pairs(game.Players:GetPlayers()) do
+                    if v.Name ~= lplr.Name then
+                        v.Chatted:connect(function(msg)
+                            local reportfound = getreport(msg)
+                            if reportfound then
+                                game.Players:ReportAbuse(v, reportfound, 'He said "' .. msg .. '", was very offensive to me')
+                                    notification("Reported" .. v.Name, "for saying " .. msg, 5)
+                            end
+                        end)
+                    end
+                end
+            end
+        end
+}
+
+local shopfunction = debug.getupvalue(require(game:GetService("ReplicatedStorage").TS.games.bedwars.shop["bedwars-shop"]).BedwarsShop.getShopItem, 2)
+local oldnexttier
+local oldtiered
+local shoptier = false
+Utility:Toggle{
+	Name = "ShopTierBypass",
+	StartingState = false,
+	Description = nil,
+	Callback = function(callback)
+	shoptier = callback
+    if shoptier then
+        for i,v in pairs(shopfunction) do
+            oldtiered = oldtiered or v.tiered
+            oldnexttier = oldnexttier or v.nextTier
+        end
+        for i,v in pairs(shopfunction) do
+            v.tiered = nil
+            v.nextTier = nil
+        end
+    else
+        for i,v in pairs(shopfunction) do
+            v.tiered = oldtiered
+            v.nextTier = oldnexttier
+        end
+    end
+end
+}
+
+
+local Distance = {["Value"] = 30}
+local Breaker = false
+World:Toggle{
+	Name = "BedBreaker",
+	StartingState = false,
+	Description = nil,
+	Callback = function(callback)
+	Breaker = callback
+	if Breaker then
+    spawn(function()
+        repeat
+            task.wait(0.1)
+            if isAlive(lplr) and lplr.Character:FindFirstChild("Humanoid").Health > 0.1 then
+                local beds = getbeds()
+                for i,v in pairs(beds) do
+                    local mag = (v.Position - lplr.Character:FindFirstChild("HumanoidRootPart").Position).Magnitude
+                    if mag < Distance["Value"] then
+                        game:GetService("ReplicatedStorage").rbxts_include.node_modules:FindFirstChild("@rbxts").net.out._NetManaged.DamageBlock:InvokeServer({
+                            ["blockRef"] = {
+                                ["blockPosition"] = getserverpos(v.Position)
+                            },
+                            ["hitPosition"] = getserverpos(v.Position),
+                            ["hitNormal"] = getserverpos(v.Position)
+                        })
+                    end
+                end
+            end
+        until not Breaker
+    end)
+  end
+end
+}
+World:Slider{
+	Name = "Distance Breaker",
+	Default = 30,
+	Min = 0,
+	Max = 50,
+	Callback = function(vaw) 
+    Distance["Value"] = vaw
+    end
+}
+GUI:Credit{
+	Name = "UI Library",
+	Description = "Mercury",
+}
+GUI:Credit{
+	Name = "engospy",
+	Description = "Get Remote Function",
+}
+GUI:Credit{
+	Name = "everyone",
+	Description = "Credit all cuz bored",
+}
+
+if whitelistname == lplr.Name then
+notification("Dev Detected", whitelistname.."in ur game", 5)
+end
