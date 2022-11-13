@@ -1,0 +1,262 @@
+
+repeat task.wait() until game:IsLoaded()
+
+repeat task.wait() until shared.GuiLibrary
+
+local GuiLibrary = shared.GuiLibrary
+
+local ScriptSettings = {}
+
+local UIS = game:GetService("UserInputService")
+
+local COB = function(tab, argstable) 
+
+    return GuiLibrary["ObjectsThatCanBeSaved"][tab.."Window"]["Api"].CreateOptionsButton(argstable)
+
+end
+
+local AnticheatDisabler = COB("World", {
+
+    Name = "Old Antivoid",
+
+    Function = function(callback) 
+
+        if callback then
+
+            local antivoidpart = Instance.new("Part", Workspace)
+
+            antivoidpart.Name = "AntiVoid"
+
+            antivoidpart.Size = Vector3.new(2100, 0.5, 2000)
+
+            antivoidpart.Position = Vector3.new(160.5, 25, 247.5)
+
+            antivoidpart.Transparency = 0.4
+
+            antivoidpart.Anchored = true
+
+            antivoidpart.Touched:connect(function(dumbcocks)
+
+                if dumbcocks.Parent:WaitForChild("Humanoid") and dumbcocks.Parent.Name == lplr.Name then
+
+                    game.Players.LocalPlayer.Character.Humanoid:ChangeState("Jumping")
+
+                    wait(0.2)
+
+                    game.Players.LocalPlayer.Character.Humanoid:ChangeState("Jumping")
+
+                    wait(0.2)
+
+                    game.Players.LocalPlayer.Character.Humanoid:ChangeState("Jumping")
+
+                end
+
+            end)
+
+        end
+
+    end,
+
+    Default = false,
+
+    HoverText = "stud antivoid"
+
+})
+
+local AnticheatDisabler = COB("World", {
+
+    Name = "UltraFPSBoost",
+
+    Function = function(callback) 
+
+        if callback then
+
+        local decalsyeeted = true -- Leaving this on makes games look shitty but the fps goes up by at least 20.
+
+local g = game
+
+local w = g.Workspace
+
+local l = g.Lighting
+
+local t = w.Terrain
+
+t.WaterWaveSize = 0
+
+t.WaterWaveSpeed = 0
+
+t.WaterReflectance = 0
+
+t.WaterTransparency = 0
+
+l.GlobalShadows = false
+
+l.FogEnd = 9e9
+
+l.Brightness = 0
+
+settings().Rendering.QualityLevel = "Level01"
+
+for i, v in pairs(g:GetDescendants()) do
+
+    if v:IsA("Part") or v:IsA("Union") or v:IsA("CornerWedgePart") or v:IsA("TrussPart") then
+
+        v.Material = "Plastic"
+
+        v.Reflectance = 0
+
+    elseif v:IsA("Decal") or v:IsA("Texture") and decalsyeeted then
+
+        v.Transparency = 1
+
+    elseif v:IsA("ParticleEmitter") or v:IsA("Trail") then
+
+        v.Lifetime = NumberRange.new(0)
+
+    elseif v:IsA("Explosion") then
+
+        v.BlastPressure = 1
+
+        v.BlastRadius = 1
+
+    elseif v:IsA("Fire") or v:IsA("SpotLight") or v:IsA("Smoke") then
+
+        v.Enabled = false
+
+    elseif v:IsA("MeshPart") then
+
+        v.Material = "Plastic"
+
+        v.Reflectance = 0
+
+        v.TextureID = 10385902758728957
+
+    end
+
+end
+
+for i, e in pairs(l:GetChildren()) do
+
+    if e:IsA("BlurEffect") or e:IsA("SunRaysEffect") or e:IsA("ColorCorrectionEffect") or e:IsA("BloomEffect") or e:IsA("DepthOfFieldEffect") then
+
+        e.Enabled = false
+
+    end
+
+end
+
+        end
+
+    end,
+
+    Default = false,
+
+    HoverText = "best fps boost out there, to bad its private cry"
+
+})
+
+local AnticheatDisabler = COB("Blatant", {
+
+    Name = "Infinite Yield",
+
+    Function = function(callback) 
+
+        if callback then
+
+        loadstring(game:HttpGet(('https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source'),true))()
+
+        end
+
+    end,
+
+    Default = false,
+
+    HoverText = false
+
+})
+
+local AnticheatDisabler = COB("Blatant", {
+
+    Name = "flying Floppa"
+
+    Function = function(callback)
+
+        if callback then
+
+                local origy = entity.character.HumanoidRootPart.Position.y
+
+                part = Instance.new("Part", workspace)
+
+                part.Size = Vector3.new(1,1,1)
+
+                part.Transparency = 1
+
+                part.Anchored = true
+
+                part.CanCollide = false
+
+                cam.CameraSubject = part
+
+                RunLoops:BindToHeartbeat("FunnyFlyPart", 1, function()
+
+                    local pos = entity.character.HumanoidRootPart.Position
+
+                    part.Position = Vector3.new(pos.x, origy, pos.z)
+
+                end)
+
+                local cf = entity.character.HumanoidRootPart.CFrame
+
+                entity.character.HumanoidRootPart.CFrame = CFrame.new(cf.x, 300000, cf.z)
+
+                if entity.character.HumanoidRootPart.Position.X < 50000 then 
+
+                    entity.character.HumanoidRootPart.CFrame *= CFrame.new(0, 100000, 0)
+
+                end
+
+            else
+
+                RunLoops:UnbindFromHeartbeat("FunnyFlyPart")
+
+                local pos = entity.character.HumanoidRootPart.Position
+
+                local rcparams = RaycastParams.new()
+
+                rcparams.FilterType = Enum.RaycastFilterType.Whitelist
+
+                rcparams.FilterDescendantsInstances = {workspace.Map}
+
+                rc = workspace:Raycast(Vector3.new(pos.x, 300, pos.z), Vector3.new(0,-1000,0), rcparams)
+
+                if rc and rc.Position then
+
+                    entity.character.HumanoidRootPart.CFrame = CFrame.new(rc.Position) * CFrame.new(0,3,0)
+
+                end
+
+                cam.CameraSubject = lplr.Character
+
+                part:Destroy()
+
+                RunLoops:BindToHeartbeat("FunnyFlyVeloEnd", 1, function()
+
+                    entity.character.HumanoidRootPart.Velocity = Vector3.new(0,0,0)
+
+                    entity.character.HumanoidRootPart.CFrame = CFrame.new(rc.Position) * CFrame.new(0,3,0)
+
+                end)
+
+                task.wait(1)
+
+                RunLoops:UnbindFromHeartbeat("FunnyFlyVeloEnd")
+
+            end    
+
+        end,  
+
+        Default = false,
+
+        HoverText = false
+
+})
