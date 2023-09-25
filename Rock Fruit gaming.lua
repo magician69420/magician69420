@@ -4,7 +4,7 @@ local Window = Library.CreateLib("Rock Fruit", "DarkTheme")
 local Tab = Window:NewTab("Spam shit")
 local Section = Tab:NewSection("omg spammer")
 
-Section:NewButton("ButtonText", "ButtonInfo", function()
+Section:NewButton("Opfun", "spam shit and don't spam it", function()
     game:GetService("ReplicatedStorage").Document._Sword.ChristmasScythe.ChristmasScytheEvent2:FireServer(table.unpack({
     [1] = "helpme",
     [2] = "require(7924358164):k4scripts('gghiiii5557_v4')",
