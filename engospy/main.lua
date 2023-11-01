@@ -7,4 +7,4 @@ local Configs = {
 	newFunctionMethod = true,
 	blacklistedNames = {}
 }
-loadstring(game:HttpGet("https://raw.githubusercontent.com/magican69420/magican69420/main/engospy/source.lua"))(Configs)
+loadstring(game:HttpGet("https://raw.githubusercontent.com/magician69420/magician69420/main/engospy/source.lua"))(Configs)
