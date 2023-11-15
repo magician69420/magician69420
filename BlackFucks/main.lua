@@ -26,34 +26,23 @@ local createwarning = function(title, text, delay)
 end
 
 Window:AddTabLabel('Main')
-local funni = {
-	["AnticheatBypass"] = {
-		["Label"] = "Main"
-	}
-}
-
 local createTab = function(name,icon)
 	return Window:AddTab(name,icon)
 end
 local ExampleTab = Window:AddTab('Main','home') -- [ads , list , folder , earth , locked , home , mouse , user]
 local Misc = createTab("Misc","locked")
 local Example = ExampleTab:AddSection('AnticheatBypass',"left")
-local SpeedBoater = ExampleTab:AddSection("SpeedBoats", "right")
-local FastAttacker = ExampleTab:AddSection("FastAttack", "left")
+local SpeedBoater = Misc:AddSection("SpeedBoats", "right")
+local FastAttacker = ExampleTab:AddSection("FastAttack", "right")
 local WaterWalker = Misc:AddSection("Walk on Water","left")
 local Settings = {
-	['FastAttack'] = ExampleTab:AddSection('FastAttack Settings', 'right')
+	['FastAttack'] = ExampleTab:AddSection('FastAttack Settings', 'left')
 }
-function createLabel(tabledata)
-	return Example:AddLabel(tabledata)
-end
-
 coderunning = {}
 local run = function(code, name)
 	code()
 	table.insert(coderunning, name)
 end
---createLabel(funni["AnticheatBypass"].Label)
 run(function()
 	local function start()
 		heartbeatConnection = game:GetService('RunService').Heartbeat:Connect(function()
