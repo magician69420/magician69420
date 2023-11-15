@@ -11,12 +11,12 @@ local Window = NEVERLOSE:AddWindow("Rise","VERSION PRIVATE")
 local Notification = NEVERLOSE:Notification()
 
 Notification.MaxNotifications = 6
-local createnotification = function(icon, title, text, delay)
-	icon = icon or "info"
+local createnotification = function(title, text, delay)
+	--icon = icon or "info"
 	title = title or "Notification"
 	text = text or "Test Notification"
 	delay = delay
-	Notification:Notify(icon, title, text, delay)
+	Notification:Notify("info", title, text, delay)
 end
 local createwarning = function(title, text, delay)
 	title = title or "Notification"
@@ -191,7 +191,7 @@ run(function()
 	Settings['FastAttack']:AddDropdown('Cooldown',DelayValue,0.175,function(val)
 		cdDelay = val
 		if cdCheck() then
-			createwarning("WARNING", "YOU CAN GET KICK AFTER STARTED FROM 0.08 - 0 PLEASE USE IT WITHOUT GETTING KICK")
+			createwarning("WARNING", "YOU CAN GET KICK AFTER STARTED FROM 0.08 - 0 PLEASE USE IT WITHOUT GETTING KICK",7)
 		end
 	end)
 end,"FastAttack")
